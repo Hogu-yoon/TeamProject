@@ -28,7 +28,7 @@ select * from board;
 
 commit;
 
-
+//
 -- 이성규 :  테스트 게시글 데이터 100개 3번 입력 후 임의 게시글 데이터 20개 1번 입력
 
 insert into board values(seq_board.nextval, '관리자', 'kim01@gmail.com', '테스트 게시글 '||seq_board.nextval, '1234', TO_DATE('2021-09-07', 'YYYY-MM-DD'), 0, seq_board.nextval, 0, 0, '테스트 게시물 내용 '||seq_board.nextval, '0:0:0:0:0:0:0:1');

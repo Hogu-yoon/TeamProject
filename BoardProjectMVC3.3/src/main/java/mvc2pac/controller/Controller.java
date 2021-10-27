@@ -130,7 +130,7 @@ public class Controller extends HttpServlet {
 				pageNum = "1";
 			}
 			int currentPage = Integer.parseInt(pageNum);
-			int startRow = (currentPage - 1) * pageSize + 1;
+			int startRow = (currentPage - 1) * pageSize;
 			int endRow = currentPage * pageSize;
 			int count = 0;
 			int number = 0;

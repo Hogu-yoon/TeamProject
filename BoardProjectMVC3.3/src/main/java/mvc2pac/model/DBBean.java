@@ -25,7 +25,7 @@ public class DBBean {
     private Connection getConnection() throws Exception {
         Context initCtx = new InitialContext();
         Context envCtx = (Context) initCtx.lookup("java:comp/env");
-        DataSource ds = (DataSource)envCtx.lookup("jdbc/basicjsp");
+        DataSource ds = (DataSource)envCtx.lookup("jdbc/redeyes");
         return ds.getConnection();
     }
  
@@ -69,7 +69,7 @@ public class DBBean {
 		     }	 
             // 쿼리를 작성
             sql = "insert into board(num,writer,email,subject,passwd,reg_date,";
-		    sql+="ref,re_step,re_level,content,ip) values(seq_board.nextval,?,?,?,?,?,?,?,?,?,?)";
+		    sql+="ref,re_step,re_level,content,ip) values(nextval('num'),?,?,?,?,?,?,?,?,?,?)";
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, article.getWriter());
@@ -133,11 +133,12 @@ public class DBBean {
         try {
             conn = getConnection();
             
-            pstmt = conn.prepareStatement(
-            	"select * from (select rownum as rnum,A.* from (select * from board order by ref desc,re_step asc) A where rownum<=?) where rnum>=?");
+            pstmt = conn.prepareStatement("SELECT * FROM board ORDER BY ref DESC LIMIT ?,?");
+            	//"select * from (select rownum as rnum,A.* from (select * from board order by ref desc,re_step asc) A where rownum<=?) where rnum>=?");
+            		
             System.out.println("start : "+start+" end : "+end);
-            pstmt.setInt(1, end);
-			pstmt.setInt(2, start);
+            pstmt.setInt(1, start);
+			pstmt.setInt(2, end);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -374,12 +375,11 @@ public class DBBean {
     public void insertUser(MemberBean mBean) {
     	Connection conn = null;
     	PreparedStatement pstmt = null;
-    	ResultSet rs = null;
     	String sql = "";
     	try {
     		conn = getConnection();
     		// INSERT INTO boardmember VALUES (seq_board_member.NEXTVAL,'root', '관리자', '1234','010-1234-1234','ggg@naver.com', TO_DATE('2021-09-09', 'yyyy-mm-dd'), 2 )
-    		sql = " INSERT INTO boardmember VALUES (seq_board_member.NEXTVAL,?,?,?,?,?,?,1 )";
+    		sql = "INSERT INTO boardmember VALUES (nextval('member_num'),?,?,?,?,?,?,1 )";
     		pstmt = conn.prepareStatement(sql);
     		pstmt.setString(1, mBean.getUser_id());
     		pstmt.setString(2, mBean.getUser_name());
@@ -387,11 +387,10 @@ public class DBBean {
     		pstmt.setString(4, mBean.getMobile());
     		pstmt.setString(5, mBean.getEmail());
     		pstmt.setTimestamp(6, mBean.getReg_date());
-    		rs = pstmt.executeQuery();
+    	    pstmt.executeUpdate();
     	}catch (Exception e) {
     		e.printStackTrace();
 		}finally {
-            if (rs != null) try { rs.close(); } catch(SQLException ex) {}
             if (pstmt != null) try { pstmt.clearParameters(); } catch(SQLException ex) {}
             if (conn != null) try { conn.close(); } catch(SQLException ex) {}
         }
